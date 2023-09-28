@@ -36,23 +36,23 @@ def matcher(text_file, threshold, build):
     values = r.mget(keys)
     licenseData = dict(list(zip(keys, values)))
     matches = get_close_matches(inputText, licenseData, threshold)
-    matchingString = get_matching_string(matches, inputText)
-    if matchingString == '':
-        licenseID = max(matches, key=matches.get)
-        spdxLicenseText = get_spdx_license_text(licenseID)
-        similarityPercent = get_similarity_percent(spdxLicenseText, inputText)
-        click.echo(colors('\nThe given license text matches {}% with that of {} based on Levenstein distance.'.format(similarityPercent, licenseID), 94))
-        differences = generate_diff(spdxLicenseText, inputText)
-        for line in differences:
-            if line[0] == '+':
-                line = colors(line, 92)
-            if line[0] == '-':
-                line = colors(line, 91)
-            if line[0] == '@':
-                line = colors(line, 90)
-            click.echo(line)
-    else:
-        click.echo(colors(matchingString, 92))
+    # matchingString = get_matching_string(matches, inputText)
+    # if matchingString == '':
+    #     licenseID = max(matches, key=matches.get)
+    #     spdxLicenseText = get_spdx_license_text(licenseID)
+    #     similarityPercent = get_similarity_percent(spdxLicenseText, inputText)
+    #     click.echo(colors('\nThe given license text matches {}% with that of {} based on Levenstein distance.'.format(similarityPercent, licenseID), 94))
+    #     differences = generate_diff(spdxLicenseText, inputText)
+    #     for line in differences:
+    #         if line[0] == '+':
+    #             line = colors(line, 92)
+    #         if line[0] == '-':
+    #             line = colors(line, 91)
+    #         if line[0] == '@':
+    #             line = colors(line, 90)
+    #         click.echo(line)
+    # else:
+    #     click.echo(colors(matchingString, 92))
 
 
 if __name__ == "__main__":
