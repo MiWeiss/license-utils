@@ -20,9 +20,9 @@ jobs:
         run: |
             python -m pip install .[lint]
       - name: Lint format with `black`
-        run: black pyworker tests --check
+        run: black license_utils tests --check
       - name: Lint imports with `isort`
-        run: isort pyworker tests --check-only --profile black
+        run: isort license_utils tests --check-only --profile black
       - name: Check docstr-coverage with `docstr-coverage`
         run: docstr-coverage
 
