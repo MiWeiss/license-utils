@@ -2,7 +2,7 @@ import os
 
 from setuptools import find_packages, setup
 
-import spdx_license_matcher
+import license_utils
 
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
@@ -13,12 +13,12 @@ with open(os.path.join(_ROOT, 'README.md')) as f:
     LONG_DESCRIPTION = f.read()
 
 setup(
-    name="spdx-license-matcher",
-    version="0.0.1",
-    description="SPDX License matcher matches the license text given by the user against the SPDX license list using an algorithm which finds close matches.",
+    name="license_utils",
+    version=license_utils.__version__,
+    description="Various utilities for working with SPDX / Open-Source licenses, such as a license matcher.",
     long_description=LONG_DESCRIPTION,
     author="SPDX",
-    url="https://github.com/ugtan/spdx-license-match-tool",
+    url="https://github.com/MiWeiss/license-utils",
     packages=find_packages(exclude=['tests*']),
     install_requires=requirements,
     setup_requires=['setuptools>=39.0.1'],

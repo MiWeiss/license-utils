@@ -3,7 +3,7 @@ import pytest
 import requests
 
 
-from spdx_license_matcher import matcher
+from license_utils import matcher
 
 
 @pytest.mark.parametrize(
