@@ -2,14 +2,13 @@ import dataclasses
 import datetime
 import json
 import logging
-from typing import Dict, List
-import warnings
-from license_utils import build_licenses
-import license_utils
-
-from license_utils.computation import compute_match_scores
-
 import os
+import warnings
+from typing import Dict, List
+
+import license_utils
+from license_utils import build_licenses
+from license_utils.computation import compute_match_scores
 
 
 def _load_licenses_from_file(cache_file: str):
@@ -50,7 +49,9 @@ class SpdxLicenseUtils:
             try:
                 self.licenses = _load_licenses_from_file(cache_file)
             except RuntimeError as e:
-                warnings.warn(f"Could not load licenses from cache file: {str(e)}. Will re-download licenses and replace cache.")
+                warnings.warn(
+                    f"Could not load licenses from cache file: {str(e)}. Will re-download licenses and replace cache."
+                )
                 pass  # We just re-download the licenses
         else:
             logging.info(

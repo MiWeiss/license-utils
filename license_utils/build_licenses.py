@@ -1,15 +1,14 @@
 import asyncio
+import dataclasses
+import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-import dataclasses
 from typing import Dict, List
 
 import requests
-import os
 from aiohttp import ClientSession, TCPConnector
 
 from license_utils.normalize import normalize
-
 
 # TODO make configurable
 MAX_SIM_CONNECTIONS = 100
@@ -93,4 +92,3 @@ def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
 
 def load_licenses_from_dict(dict_licenses: List[Dict]) -> List[SpdxLicense]:
     return [SpdxLicense(**j) for j in dict_licenses]
-
