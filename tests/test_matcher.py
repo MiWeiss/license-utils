@@ -1,7 +1,7 @@
 import os
+
 import pytest
 import requests
-
 
 from license_utils import matcher
 
