@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - '**.py'
-      - '.github/workflows/linting_and_unittests.yml'
+      - '.github/workflows/linting_and_testing.yml'
   pull_request:
     branches: ["main"]
 
