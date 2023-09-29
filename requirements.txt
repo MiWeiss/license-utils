@@ -6,7 +6,6 @@ click==7.0
 python-dotenv>=0.17.1
 
 aiohttp~=3.8.5
-tqdm~=4.66.1
 
 # Dev Dependencies (TODO own file)
 pytest

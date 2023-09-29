@@ -1,4 +1,3 @@
-import pytest
 from spdx_license_matcher.build_licenses import fetch_spdx_licenses
 
 def test_build_licenses():

@@ -2,15 +2,13 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 import dataclasses
-from typing import List
-import tqdm
+from typing import Dict, List
 
 import requests
 import os
 from aiohttp import ClientSession, TCPConnector
 
 from spdx_license_matcher.normalize import normalize
-from spdx_license_matcher.utils import compressStringToBytes
 
 
 # TODO make configurable
@@ -29,7 +27,9 @@ class SpdxLicense:
     text: str | None = None
     _normalized_text: str | None = None
 
-    async def load_text_if_not_set(self, session: ClientSession, semaphore: asyncio.BoundedSemaphore):
+    async def load_text_if_not_set(
+        self, session: ClientSession, semaphore: asyncio.BoundedSemaphore
+    ):
         if self.text == None:
             async with semaphore:
                 print(f"Downloading license text for {self.spdx_id}")
@@ -74,19 +74,23 @@ def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
     if load_text:
 
         async def load_license_texts():
-
             semaphore = asyncio.BoundedSemaphore(MAX_SIM_CONNECTIONS)
-            
+
             awaitables = []
-            # connector = TCPConnector(limit=MAX_SIM_CONNECTIONS)
-            # async with ClientSession(connector=connector) as session:
-            async with ClientSession() as session:
+            connector = TCPConnector(limit=MAX_SIM_CONNECTIONS)
+            async with ClientSession(connector=connector) as session:
                 for l in licenses:
-                    awaitables.append(l.load_text_if_not_set(session=session, semaphore=semaphore))
+                    awaitables.append(
+                        l.load_text_if_not_set(session=session, semaphore=semaphore)
+                    )
 
                 await asyncio.gather(*awaitables)
 
         asyncio.run(load_license_texts())
 
     return licenses
+
+
+def load_licenses_from_dict(dict_licenses: List[Dict]) -> List[SpdxLicense]:
+    return [SpdxLicense(**j) for j in dict_licenses]
 
