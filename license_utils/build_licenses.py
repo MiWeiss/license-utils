@@ -8,7 +8,7 @@ import requests
 import os
 from aiohttp import ClientSession, TCPConnector
 
-from spdx_license_matcher.normalize import normalize
+from license_utils.normalize import normalize
 
 
 # TODO make configurable
