@@ -19,6 +19,7 @@ setup(
     packages=find_packages(exclude=['tests*']),
     install_requires=[
         "aiohttp>=3.8.5",
+        "requests>=2.31.0"
     ],
     extras_require={
         "test": [
