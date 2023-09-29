@@ -14,7 +14,7 @@ with open(os.path.join(_ROOT, 'README.md')) as f:
 
 setup(
     name="spdx-license-matcher",
-    version=spdx_license_matcher.__version__,
+    version="0.0.1",
     description="SPDX License matcher matches the license text given by the user against the SPDX license list using an algorithm which finds close matches.",
     long_description=LONG_DESCRIPTION,
     author="SPDX",

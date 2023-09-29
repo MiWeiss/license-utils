@@ -1,59 +1,70 @@
-import click
-import codecs
-import redis
+import dataclasses
+import datetime
+import json
+import logging
+from typing import Dict, List
+import warnings
+from spdx_license_matcher import build_licenses
+import spdx_license_matcher
 
-from spdx_license_matcher.build_licenses import build_spdx_licenses, is_keys_empty,get_url
-from spdx_license_matcher.computation import get_close_matches, get_matching_string
-from spdx_license_matcher.difference import generate_diff, get_similarity_percent
-from spdx_license_matcher.utils import colors, get_spdx_license_text
+from spdx_license_matcher.computation import compute_match_scores
 
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
-@click.command()
-@click.option('--text_file', '-f', required=True, help='The name of the file in which there is the text you want to match against the SPDX License database.')
-@click.option('--threshold', '-t', default=0.9, type = click.FloatRange(0.0, 1.0), help='Confidence threshold below which we just won"t consider it a match.', show_default=True)
-@click.option('--build/--no-build', default=False, help='Builds the SPDX license list in the database. If licenses are already present it will update the redis database.')
-def matcher(text_file, threshold, build):
-    """SPDX License matcher to match license text against the SPDX license list using an algorithm which finds close matches. """
-    try:
-
-        # For python 2
-        inputText = codecs.open(text_file, 'r', encoding='string_escape').read()
-        inputText = unicode(inputText, 'utf-8')
-    except:
-        # For python 3
-        inputText = codecs.open(text_file, 'r', encoding='unicode_escape').read()
-
-    if build or is_keys_empty():
-        click.echo('Building SPDX License List. This may take a while...')
-        build_spdx_licenses()
-
-    r = redis.StrictRedis(host=os.environ.get(key="SPDX_REDIS_HOST", default="localhost"), port=6379, db=0)
-    keys = list(r.keys())
-    values = r.mget(keys)
-    licenseData = dict(list(zip(keys, values)))
-    matches = get_close_matches(inputText, licenseData, threshold)
-    # matchingString = get_matching_string(matches, inputText)
-    # if matchingString == '':
-    #     licenseID = max(matches, key=matches.get)
-    #     spdxLicenseText = get_spdx_license_text(licenseID)
-    #     similarityPercent = get_similarity_percent(spdxLicenseText, inputText)
-    #     click.echo(colors('\nThe given license text matches {}% with that of {} based on Levenstein distance.'.format(similarityPercent, licenseID), 94))
-    #     differences = generate_diff(spdxLicenseText, inputText)
-    #     for line in differences:
-    #         if line[0] == '+':
-    #             line = colors(line, 92)
-    #         if line[0] == '-':
-    #             line = colors(line, 91)
-    #         if line[0] == '@':
-    #             line = colors(line, 90)
-    #         click.echo(line)
-    # else:
-    #     click.echo(colors(matchingString, 92))
+def _load_licenses_from_file(cache_file: str):
+    if not os.path.exists(cache_file):
+        raise RuntimeError(f"License cache file {cache_file} does not exist")
+    with open(cache_file, "r") as f:
+        licenses_dict = json.load(f)
+        if licenses_dict["version"] != spdx_license_matcher.__version__:
+            warnings.warn(
+                f"License cache file {cache_file} was created with a different "
+                + f"version of spdx-license-matcher (cache version: {licenses_dict['version']}, "
+                + f"current version: {spdx_license_matcher.__version__})."
+                + "We thus re-download the licenses and replace the cache."
+            )
+            raise RuntimeError("Cache file version mismatch")
+        return build_licenses.load_licenses_from_dict(licenses_dict["licenses"])
 
 
-if __name__ == "__main__":
-    matcher()
+def _store_licenses_to_file(
+    licenses: List[build_licenses.SpdxLicense], cache_file: str
+):
+    licenses_dict = {
+        "version": spdx_license_matcher.__version__,
+        "timestamp": datetime.datetime.now().isoformat(),
+        "licenses": [dataclasses.asdict(l) for l in licenses],
+    }
+    os.makedirs(os.path.dirname(cache_file), exist_ok=True)
+    with open(cache_file, "w") as f:
+        f.write(json.dumps(licenses_dict))
+
+
+class SpdxLicenseUtils:
+    licenses = None
+
+    def __init__(self, cache_file: str | None = None):
+        self.cache_file = cache_file
+        if cache_file != None:
+            try:
+                self.licenses = _load_licenses_from_file(cache_file)
+            except RuntimeError as e:
+                warnings.warn(f"Could not load licenses from cache file: {str(e)}. Will re-download licenses and replace cache.")
+                pass  # We just re-download the licenses
+        else:
+            logging.info(
+                "No cache file specified. We will re-download the licenses every time."
+                "This takes a while and requires a internet connection."
+            )
+
+        if self.licenses == None:
+            self.fetch_licenses()
+
+    def fetch_licenses(self):
+        self.licenses = build_licenses.fetch_spdx_licenses(load_text=True)
+        if self.cache_file != None:
+            _store_licenses_to_file(self.licenses, self.cache_file)
+
+    def match_text_to_id(self, license_text: str) -> Dict[str, float]:
+        return compute_match_scores(license_text, self.licenses)
