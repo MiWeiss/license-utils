@@ -4,10 +4,10 @@ import json
 import logging
 from typing import Dict, List
 import warnings
-from spdx_license_matcher import build_licenses
-import spdx_license_matcher
+from license_utils import build_licenses
+import license_utils
 
-from spdx_license_matcher.computation import compute_match_scores
+from license_utils.computation import compute_match_scores
 
 import os
 
@@ -17,11 +17,11 @@ def _load_licenses_from_file(cache_file: str):
         raise RuntimeError(f"License cache file {cache_file} does not exist")
     with open(cache_file, "r") as f:
         licenses_dict = json.load(f)
-        if licenses_dict["version"] != spdx_license_matcher.__version__:
+        if licenses_dict["version"] != license_utils.__version__:
             warnings.warn(
                 f"License cache file {cache_file} was created with a different "
                 + f"version of spdx-license-matcher (cache version: {licenses_dict['version']}, "
-                + f"current version: {spdx_license_matcher.__version__})."
+                + f"current version: {license_utils.__version__})."
                 + "We thus re-download the licenses and replace the cache."
             )
             raise RuntimeError("Cache file version mismatch")
@@ -32,7 +32,7 @@ def _store_licenses_to_file(
     licenses: List[build_licenses.SpdxLicense], cache_file: str
 ):
     licenses_dict = {
-        "version": spdx_license_matcher.__version__,
+        "version": license_utils.__version__,
         "timestamp": datetime.datetime.now().isoformat(),
         "licenses": [dataclasses.asdict(l) for l in licenses],
     }

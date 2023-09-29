@@ -1,4 +1,4 @@
-from spdx_license_matcher.build_licenses import fetch_spdx_licenses
+from license_utils.build_licenses import fetch_spdx_licenses
 
 def test_build_licenses():
     licenses = fetch_spdx_licenses(load_text=True)

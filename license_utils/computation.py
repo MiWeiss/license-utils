@@ -1,7 +1,7 @@
 from typing import List
-from spdx_license_matcher.build_licenses import SpdxLicense
-from spdx_license_matcher.normalize import normalize
-from spdx_license_matcher.sorensen_dice import get_dice_coefficient
+from license_utils.build_licenses import SpdxLicense
+from license_utils.normalize import normalize
+from license_utils.sorensen_dice import get_dice_coefficient
 
 
 def compute_match_scores(inputText, licenses: List[SpdxLicense]):
