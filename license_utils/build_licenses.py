@@ -1,5 +1,6 @@
 import asyncio
 import dataclasses
+import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -31,7 +32,7 @@ class SpdxLicense:
     ):
         if self.text == None:
             async with semaphore:
-                print(f"Downloading license text for {self.spdx_id}")
+                logging.info(f"Downloading license text for {self.spdx_id}")
                 async with session.get(self.datails_url) as response:
                     if response.status != 200:
                         raise RuntimeError(
@@ -42,7 +43,7 @@ class SpdxLicense:
                     self.text = response_json["licenseText"]
                     self._normalized_text = normalize(self.text)
                     # TODO: there's other fields we may want to store
-                print(f"Downloaded license text for {self.spdx_id}")
+                logging.info(f"Downloaded license text for {self.spdx_id}")
 
     @property
     def normalized_text(self) -> str:
