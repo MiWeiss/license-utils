@@ -2,8 +2,6 @@ import os
 
 from setuptools import find_packages, setup
 
-import license_utils
-
 _ROOT = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(_ROOT, 'README.md')) as f:
@@ -11,7 +9,7 @@ with open(os.path.join(_ROOT, 'README.md')) as f:
 
 setup(
     name="license-utils",
-    version=license_utils.__version__,
+    version="0.0.1"
     description="Various utilities for working with SPDX / OSS licenses, including a spdx-based license matcher.",
     long_description=LONG_DESCRIPTION,
     author="SPDX",
