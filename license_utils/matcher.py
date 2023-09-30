@@ -41,13 +41,16 @@ def _store_licenses_to_file(
 
 
 class SpdxLicenseUtils:
-    licenses = None
 
-    def __init__(self, cache_file: str | None = None):
+    def __init__(self, licenses, cache_file: str | None = None):
+        self.licenses = licenses
         self.cache_file = cache_file
+
+    @staticmethod
+    async def create(cache_file: str | None = None):
         if cache_file != None:
             try:
-                self.licenses = _load_licenses_from_file(cache_file)
+                licenses = _load_licenses_from_file(cache_file)
             except RuntimeError as e:
                 warnings.warn(
                     f"Could not load licenses from cache file: {str(e)}. Will re-download licenses and replace cache."
@@ -58,12 +61,16 @@ class SpdxLicenseUtils:
                 "No cache file specified. We will re-download the licenses every time."
                 "This takes a while and requires a internet connection."
             )
+        
+        new_instance = SpdxLicenseUtils(licenses, cache_file)
 
-        if self.licenses == None:
-            self.fetch_licenses()
+        if licenses == None:
+            await new_instance.fetch_licenses()
 
-    def fetch_licenses(self):
-        self.licenses = build_licenses.fetch_spdx_licenses(load_text=True)
+        return new_instance
+
+    async def fetch_licenses(self):
+        self.licenses = await build_licenses.fetch_spdx_licenses(load_text=True)
         if self.cache_file != None:
             _store_licenses_to_file(self.licenses, self.cache_file)
 

@@ -51,7 +51,7 @@ class SpdxLicense:
         return self._normalized_text
 
 
-def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
+async def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
     url = "https://spdx.org/licenses/licenses.json"
 
     response = requests.get(url)
@@ -72,29 +72,18 @@ def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
 
     if load_text:
 
-        async def load_license_texts():
-            semaphore = asyncio.BoundedSemaphore(MAX_SIM_CONNECTIONS)
+        semaphore = asyncio.BoundedSemaphore(MAX_SIM_CONNECTIONS)
 
-            awaitables = []
-            connector = TCPConnector(limit=MAX_SIM_CONNECTIONS)
-            async with ClientSession(connector=connector) as session:
-                for l in licenses:
-                    awaitables.append(
-                        l.load_text_if_not_set(session=session, semaphore=semaphore)
-                    )
+        awaitables = []
+        connector = TCPConnector(limit=MAX_SIM_CONNECTIONS)
+        async with ClientSession(connector=connector) as session:
+            for l in licenses:
+                awaitables.append(
+                    l.load_text_if_not_set(session=session, semaphore=semaphore)
+                )
 
-                await asyncio.gather(*awaitables)
+            await asyncio.gather(*awaitables)
 
-        try:
-            asyncio.run(load_license_texts())
-        except RuntimeError as e:
-            if "already running" in str(e):
-                import nest_asyncio
-
-                nest_asyncio.apply()
-                asyncio.run(load_license_texts())
-            else:
-                raise e
 
     return licenses
 

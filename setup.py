@@ -35,6 +35,7 @@ setup(
     extras_require={
         "test": [
             "pytest",
+            "pytest-asyncio",
         ],
         "lint": [
             "black==23.3.0",
