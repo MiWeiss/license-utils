@@ -1,5 +1,7 @@
 import pytest
+
 from license_utils.build_licenses import fetch_spdx_licenses
+
 
 @pytest.mark.asyncio
 async def test_build_licenses():

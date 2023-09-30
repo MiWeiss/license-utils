@@ -72,7 +72,6 @@ async def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
     ]
 
     if load_text:
-
         semaphore = asyncio.BoundedSemaphore(MAX_SIM_CONNECTIONS)
 
         awaitables = []
@@ -84,7 +83,6 @@ async def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
                 )
 
             await asyncio.gather(*awaitables)
-
 
     return licenses
 

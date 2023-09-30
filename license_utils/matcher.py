@@ -41,7 +41,6 @@ def _store_licenses_to_file(
 
 
 class SpdxLicenseUtils:
-
     def __init__(self, licenses, cache_file: str | None = None):
         self.licenses = licenses
         self.cache_file = cache_file
@@ -62,7 +61,7 @@ class SpdxLicenseUtils:
                 "No cache file specified. We will re-download the licenses every time."
                 "This takes a while and requires a internet connection."
             )
-        
+
         new_instance = SpdxLicenseUtils(licenses, cache_file)
 
         if licenses == None:
