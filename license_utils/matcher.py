@@ -48,6 +48,7 @@ class SpdxLicenseUtils:
 
     @staticmethod
     async def create(cache_file: str | None = None):
+        licenses = None
         if cache_file != None:
             try:
                 licenses = _load_licenses_from_file(cache_file)
