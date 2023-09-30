@@ -9,7 +9,7 @@ with open(os.path.join(_ROOT, 'README.md')) as f:
 
 setup(
     name="license-utils",
-    version="0.0.1"
+    version="0.0.1",
     description="Various utilities for working with SPDX / OSS licenses, including a spdx-based license matcher.",
     long_description=LONG_DESCRIPTION,
     author="SPDX",
