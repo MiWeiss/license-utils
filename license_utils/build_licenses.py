@@ -85,7 +85,8 @@ def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
 
                 await asyncio.gather(*awaitables)
 
-        asyncio.run(load_license_texts())
+        event_loop = asyncio.get_event_loop()
+        event_loop.run_until_complete(load_license_texts())
 
     return licenses
 
