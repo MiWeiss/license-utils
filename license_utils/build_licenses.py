@@ -1,5 +1,6 @@
 import asyncio
 import dataclasses
+import logging
 import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
@@ -31,7 +32,7 @@ class SpdxLicense:
     ):
         if self.text == None:
             async with semaphore:
-                print(f"Downloading license text for {self.spdx_id}")
+                logging.info(f"Downloading license text for {self.spdx_id}")
                 async with session.get(self.datails_url) as response:
                     if response.status != 200:
                         raise RuntimeError(
@@ -42,7 +43,7 @@ class SpdxLicense:
                     self.text = response_json["licenseText"]
                     self._normalized_text = normalize(self.text)
                     # TODO: there's other fields we may want to store
-                print(f"Downloaded license text for {self.spdx_id}")
+                logging.info(f"Downloaded license text for {self.spdx_id}")
 
     @property
     def normalized_text(self) -> str:
@@ -51,7 +52,7 @@ class SpdxLicense:
         return self._normalized_text
 
 
-def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
+async def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
     url = "https://spdx.org/licenses/licenses.json"
 
     response = requests.get(url)
@@ -71,21 +72,17 @@ def fetch_spdx_licenses(load_text: bool) -> List[SpdxLicense]:
     ]
 
     if load_text:
+        semaphore = asyncio.BoundedSemaphore(MAX_SIM_CONNECTIONS)
 
-        async def load_license_texts():
-            semaphore = asyncio.BoundedSemaphore(MAX_SIM_CONNECTIONS)
+        awaitables = []
+        connector = TCPConnector(limit=MAX_SIM_CONNECTIONS)
+        async with ClientSession(connector=connector) as session:
+            for l in licenses:
+                awaitables.append(
+                    l.load_text_if_not_set(session=session, semaphore=semaphore)
+                )
 
-            awaitables = []
-            connector = TCPConnector(limit=MAX_SIM_CONNECTIONS)
-            async with ClientSession(connector=connector) as session:
-                for l in licenses:
-                    awaitables.append(
-                        l.load_text_if_not_set(session=session, semaphore=semaphore)
-                    )
-
-                await asyncio.gather(*awaitables)
-
-        asyncio.run(load_license_texts())
+            await asyncio.gather(*awaitables)
 
     return licenses
 

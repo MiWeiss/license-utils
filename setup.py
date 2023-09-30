@@ -31,10 +31,11 @@ setup(
     author="SPDX",
     url="https://github.com/miweiss/license-utils",
     packages=find_packages(exclude=["tests*"]),
-    install_requires=["aiohttp>=3.8.5", "requests>=2.31.0"],
+    install_requires=["aiohttp>=3.8.5", "requests>=2.31.0", "nest_asyncio>=1.5.8"],
     extras_require={
         "test": [
             "pytest",
+            "pytest-asyncio",
         ],
         "lint": [
             "black==23.3.0",

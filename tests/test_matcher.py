@@ -6,6 +6,7 @@ import requests
 from license_utils import matcher
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "github_path,spdx_id",
     [
@@ -19,7 +20,7 @@ from license_utils import matcher
         ),
     ],
 )
-def test_matcher(github_path: str, spdx_id: str):
+async def test_matcher(github_path: str, spdx_id: str):
     # Download the license text from github, if not already cached
     local_license_path = os.path.join(
         "tests/resources/licenses", github_path.replace("/", "_")
@@ -34,7 +35,7 @@ def test_matcher(github_path: str, spdx_id: str):
         with open(local_license_path, "w") as f:
             f.write(license_text)
 
-    license_utils = matcher.SpdxLicenseUtils(
+    license_utils = await matcher.SpdxLicenseUtils.create(
         cache_file="tests/resources/.license_cache.json"
     )
 
