@@ -33,6 +33,7 @@ setup(
     url="https://github.com/miweiss/license-utils",
     packages=find_packages(exclude=["tests*"]),
     install_requires=["aiohttp>=3.8.5", "requests>=2.31.0", "nest_asyncio>=1.5.8"],
+    license="MIT",
     extras_require={
         "test": [
             "pytest",
@@ -50,4 +51,10 @@ setup(
         ]
     },
     keywords="spdx license license-matcher",
+    classifiers=[        
+        "Development Status :: 4 - Beta",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ]
 )
