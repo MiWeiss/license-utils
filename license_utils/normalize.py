@@ -89,7 +89,7 @@ def normalize(licenseText):
 
     # To remove the license name or title present at the beginning of the license text.
     # if "license" in licenseText.split("\n")[0]:
-        # licenseText = "\n".join(licenseText.split("\n")[1:])
+    # licenseText = "\n".join(licenseText.split("\n")[1:])
 
     # To avoid the possibility of a non-match due to variations of bullets, numbers, letter, or no bullets used are simply removed.
     licenseText = re.sub(BULLETS_NUMBERING_REGEX, " ", licenseText)
