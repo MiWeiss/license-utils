@@ -16,7 +16,7 @@ from license_utils import matcher
         ),
         (
             "upscayl/upscayl/568224182510952690d057c2708f3e932807f5ff/LICENSE",
-            "AGPL-3.0",
+            "AGPL-3.0-only",
         ),
     ],
 )
@@ -43,3 +43,6 @@ async def test_matcher(github_path: str, spdx_id: str):
 
     assert matching[spdx_id] > 0.95
     assert matching[spdx_id] == max(matching.values())
+
+    first_match = license_utils.find_match(license_text, 0.99)
+    assert spdx_id == first_match.spdx_id
