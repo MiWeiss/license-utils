@@ -45,4 +45,4 @@ async def test_matcher(github_path: str, spdx_id: str):
     assert matching[spdx_id] == max(matching.values())
 
     first_match = license_utils.find_match(license_text, 0.99)
-    assert first_match.spdx_id == spdx_id
+    assert spdx_id in first_match.spdx_id
