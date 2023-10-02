@@ -76,3 +76,14 @@ class SpdxLicenseUtils:
 
     def match_text_to_id(self, license_text: str) -> Dict[str, float]:
         return compute_match_scores(license_text, self.licenses)
+
+    def find_match(
+        self, license_text: str, threshold: float
+    ) -> build_licenses.SpdxLicense | None:
+        result = compute_match_scores(
+            license_text, self.licenses, return_first_threshold=threshold
+        )
+        if isinstance(result, build_licenses.SpdxLicense):
+            return result
+        else:
+            return None
